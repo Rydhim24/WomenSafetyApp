@@ -13,6 +13,13 @@ function Home() {
             >
                 SOS
             </button>
+
+            <button
+                onClick={() => navigate("/contacts")}
+                className="bg-white border px-10 py-3 rounded-lg shadow-sm"
+            >
+                Manage Trusted Contacts
+            </button>
         </div>
     )
 }
