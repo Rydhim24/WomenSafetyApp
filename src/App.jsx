@@ -3,6 +3,8 @@ import Login from "./pages/Login"
 import Home from "./pages/Home"
 import SOS from "./pages/SOS"
 import Contacts from "./pages/Contacts"
+import Community from "./pages/Community"
+
 function App() {
   return (
     <Routes>
@@ -10,6 +12,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/sos" element={<SOS />} />
       <Route path="/contacts" element={<Contacts />} />
+      <Route path="/community" element={<Community />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" />} />
