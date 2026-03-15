@@ -9,9 +9,14 @@ function Community() {
     const [location, setLocation] = useState(null)
     const [error, setError] = useState(null)
 
+    // Fetch reports from backend + get location
     useEffect(() => {
-        const saved = localStorage.getItem("communityReports")
-        if (saved) setReports(JSON.parse(saved))
+
+        // Fetch reports from backend
+        fetch("http://localhost:5000/reports")
+            .then(res => res.json())
+            .then(data => setReports(data))
+            .catch(err => console.error("Fetch error:", err))
 
         // Auto-fetch location
         if (!navigator.geolocation) {
@@ -28,14 +33,10 @@ function Community() {
             },
             () => setError("Location access denied")
         )
+
     }, [])
 
-    const saveReports = (updated) => {
-        localStorage.setItem("communityReports", JSON.stringify(updated))
-        setReports(updated)
-    }
-
-    // Simple AI-style keyword analysis
+    // AI keyword analysis
     const generateAIReport = (input) => {
         const text = input.toLowerCase()
 
@@ -54,7 +55,7 @@ function Community() {
         return "General safety concern reported by user. Further community validation recommended."
     }
 
-    const addReport = () => {
+    const addReport = async () => {
         if (!keywords || !location) return
 
         const aiAnalysis = generateAIReport(keywords)
@@ -66,15 +67,31 @@ function Community() {
             timestamp: new Date().toLocaleString(),
         }
 
-        const updated = [newReport, ...reports]
-        saveReports(updated)
+        try {
+            const response = await fetch("http://localhost:5000/reports", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newReport)
+            })
 
-        setKeywords("")
+            const data = await response.json()
+
+            if (data.success) {
+                setReports(prev => [newReport, ...prev])
+                setKeywords("")
+            }
+
+        } catch (err) {
+            console.error("Submit error:", err)
+        }
     }
 
     return (
         <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-xl shadow-md w-[500px]">
+
                 <h1 className="text-2xl font-bold mb-4 text-center">
                     Community Safety Reports
                 </h1>
@@ -122,6 +139,7 @@ function Community() {
                 >
                     Back
                 </button>
+
             </div>
         </div>
     )
