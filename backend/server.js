@@ -1,6 +1,9 @@
 const express = require("express")
 const cors = require("cors")
+const dotenv = require("dotenv")
 const mongoose = require("mongoose")
+
+dotenv.config()  // load .env into process.env
 
 const reportRoutes = require("./routes/reportRoutes")
 
@@ -10,7 +13,13 @@ app.use(cors())
 app.use(express.json())
 
 // ✅ MongoDB Connection
-mongoose.connect("mongodb+srv://admin:admin@riddhimacluster.m8cyho5.mongodb.net/womenSafetyDB?appName=RiddhimaCluster")
+const mongoUrl = process.env.MONGO_URL
+if (!mongoUrl) {
+    console.error("❌ MONGO_URL is not defined. Check your .env file and ensure dotenv is configured.")
+    process.exit(1)
+}
+
+mongoose.connect(mongoUrl)
     .then(() => console.log("✅ MongoDB Connected"))
     .catch(err => console.log("❌ MongoDB Error:", err))
 
